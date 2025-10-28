@@ -39,10 +39,28 @@ app.put('/komiks/:id', async (req, res) => {
             return res.status(404).send({ message: 'Komik not found' });
         }
         await komik.update(data);
-        res.send(message: 'Komik updated successfully');
+        return res.status(200).send({ 
+            message: 'Komik updated successfully',
+            data: komik 
+        });
     }
     catch (error) {
-        res.status(500).send({ message: error.message });
+        console.error("Error updating Komik:", error);
+        return res.status(500).send({ message: error.message });
     }
 });
 
+
+app.delete('/komiks/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+        const komik = await db.Komik.findByPk(id);
+        if (!komik) {
+            return res.status(404).send({ message: 'Komik not found' });
+        }
+        await komik.destroy();
+        res.send({ message: 'Komik deleted successfully' });
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+});
