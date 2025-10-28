@@ -20,3 +20,12 @@ db.sequelize.sync().then(() => {
     console.error('Unable to connect to the database:', err);
 });
 
+app.post('/komiks', async (req, res) => {
+    const data = req.body;
+    try {
+        const komik = await db.Komik.create(data);
+        res.send(komik);
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+});
