@@ -20,38 +20,58 @@ db.sequelize.sync().then(() => {
     console.error('Unable to connect to the database:', err);
 });
 
-app.post('/komiks', async (req, res) => {
+
+app.get('/komik', async (req, res) => {
+  try {
+    const komik = await db.Komik.findAll();
+    res.send(komik);
+  } catch (error) {
+    res.status(500).send({message: error.message});
+  }
+});
+
+app.post('/komik', async (req, res) => {
     const data = req.body;
     try {
         const komik = await db.Komik.create(data);
         res.send(komik);
     } catch (error) {
-        res.status(500).send({ message: error.message });
+        res.status(500).send({ messafe: error.message });
     }
 });
 
-app.put('/komiks/:id', async (req, res) => {
+app.put('/komik/:id', async (req, res) => {
+  const id = req.params.id;
+  const data = req.body;
+  try {
+    const komik = await db.Komik.findByPk(id);
+    if(!komik) {
+      return res.status(404).send({message: 'Komik not found'});
+    }
+    
+    await komik.update(data);
+    res.send({message: "Komik berhasil diupdate", komik});
+  } catch (error) {
+    res.send(error);
+  }
+});
+
+
+app.delete('/komik/:id', async (req, res) => {
     const id = req.params.id;
-    const data = req.body;
     try {
         const komik = await db.Komik.findByPk(id);
         if (!komik) {
             return res.status(404).send({ message: 'Komik not found' });
         }
-        await komik.update(data);
-        return res.status(200).send({ 
-            message: 'Komik updated successfully',
-            data: komik 
-        });
-    }
-    catch (error) {
-        console.error("Error updating Komik:", error);
-        return res.status(500).send({ message: error.message });
+        await komik.destroy();
+        res.send({ message: 'Komik deleted successfully' });
+    } catch (error) {
+        res.status(500).send({ message: error.message });
     }
 });
 
-
-app.delete('/komiks/:id', async (req, res) => {
+app.delete('/komik/:id', async (req, res) => {
     const id = req.params.id;
     try {
         const komik = await db.Komik.findByPk(id);
