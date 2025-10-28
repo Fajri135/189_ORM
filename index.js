@@ -3,3 +3,6 @@ const app = express();
 const db = require('./src/models');
 const PORT = process.env.PORT || 3000;
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
